@@ -39,8 +39,10 @@ type config struct {
 }
 
 type moduleConfig struct {
+	Scrape  *bool                  `yaml:"scrape"`
 	Method  string                 `yaml:"method"`
 	Timeout time.Duration          `yaml:"timeout"`
+	Labels  map[string]string      `yaml:"labels"`
 	XXX     map[string]interface{} `yaml:",inline"`
 
 	Exec execConfig `yaml:"exec"`
@@ -115,6 +117,11 @@ func readModuleConfig(name string, r io.Reader) (*moduleConfig, error) {
 func checkModuleConfig(name string, cfg *moduleConfig) error {
 	if len(cfg.XXX) != 0 {
 		return fmt.Errorf("unknown module configuration fields: %v", cfg.XXX)
+	}
+
+	if cfg.Scrape == nil {
+		v := true
+		cfg.Scrape = &v
 	}
 
 	cfg.name = name
